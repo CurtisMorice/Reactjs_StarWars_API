@@ -1,5 +1,8 @@
 import React, { Component } from 'react';
 import axios from 'axios';
+import Header from '../Header/Header';
+import PlanetList from '../PlanetList/PlanetList';
+import People from '../People/People';
 import './App.css';
 
 class App extends Component {
@@ -8,7 +11,8 @@ class App extends Component {
   constructor(props){
     super(props);
     this.state = {
-      planetList: []
+      planetList: [],
+      peopleArray: [],
     }
   }
 
@@ -16,10 +20,32 @@ class App extends Component {
   // It is called by React when the component is loaded and ready to go!
   componentDidMount() {
     console.log('App component mounted');
-    const url = 'https://swapi.co/api/planets/?format=json'
+    const url = 'https://swapi.co/api/planets/?format=json';
+    const peopleUrl = 'https://swapi.co/api/people/?format=json'
     this.getPlanets(url);
+    this.getPeople(peopleUrl);
   }
   
+getPeople(peopleUrl) {
+console.log(peopleUrl);
+axios.get(peopleUrl)
+.then((response)=>{
+  this.setState({peopleArray:[...this.state.peopleArray, ...response.data.results]});
+  if(response.data.next == null){
+    console.log('Made it to last page',response.data.next);
+  }
+  else{
+   this.getPeople(response.data.next);
+  console.log(response.data);
+  }
+}).catch((error)=>{
+  console.log('error in getPeople', error);
+});
+}
+
+
+
+
   async getPlanets(url) {
     let nextUrl = url;
     while (nextUrl != null) {
@@ -43,17 +69,9 @@ class App extends Component {
     console.log('PlanetList:', this.state.planetList);
     return (
       <div className="App">
-        <header className="App-header">
-          <h1 className="App-title">SWAPI Planets</h1>
-        </header>
-        <section>
-          {/* 3. Put a unordered list of planet names here! */}
-          <ul>
-            { this.state.planetList.map( planet => 
-              <li key={planet.url}>{planet.name}</li> ) 
-            }
-          </ul>
-        </section>
+       <Header />
+       <PlanetList array={this.state.planetList} />
+        <People array={this.state.peopleArray} />
       </div>
     );
   }
