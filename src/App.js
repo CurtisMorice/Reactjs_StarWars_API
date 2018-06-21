@@ -19,20 +19,22 @@ class App extends Component {
     const url = 'https://swapi.co/api/planets/?format=json'
     this.getPlanets(url);
   }
-
-  getPlanets(nextUrl) {
-    if (nextUrl != null) {
-      axios.get(nextUrl)
+  
+  async getPlanets(url) {
+    let nextUrl = url;
+    while (nextUrl != null) {
+      await axios.get(nextUrl)
         .then((response)=> {
           console.log('Got more planets', response.data.results);
           this.setState( { planetList: 
             [ ...this.state.planetList, ...response.data.results]
           } );
-          this.getPlanets(response.data.next)
+          nextUrl = response.data.next;
           console.log('The next URL is:', nextUrl);
         })
         .catch((error) => {
           console.log('Error getting more planets', error)
+          nextUrl = null;
         })
     }
   }
