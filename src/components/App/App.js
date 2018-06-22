@@ -1,9 +1,15 @@
 import React, { Component } from 'react';
+import {BrowserRouter as Router, Link, Route} from 'react-router-dom';
 import axios from 'axios';
+
+
 import Header from '../Header/Header';
-import PlanetList from '../PlanetList/PlanetList';
-import People from '../People/People';
+import Home from '../../pages/Home/Home';
+import PlanetList from '../../pages/PlanetList/PlanetList';
+import People from '../../pages/People/People';
 import './App.css';
+import Planets from '../../components/StarWars-Planets/StarWars-Planets';
+import StarWarsPeople from '../StarWars-People/StarWars-People';
 
 class App extends Component {
 
@@ -66,13 +72,25 @@ axios.get(peopleUrl)
   }
 
   render() {
-    console.log('PlanetList:', this.state.planetList);
+    // console.log('PlanetList:', this.state.planetList);
     return (
+      <Router>
       <div className="App">
-       <Header />
-       <PlanetList array={this.state.planetList} />
-        <People array={this.state.peopleArray} />
+      <Header />
+      <ul>
+        <li><Link to='/'>Home</Link></li>
+        <li><Link to={{pathname: '/people', state: {peopleArray: [...this.state.peopleArray]}}}>People</Link></li>
+        <li><Link to={{pathname: '/planets', state: [...this.state.planetList]}}>Planets</Link></li>
+      </ul>
+
+        <Route exact path='/' component={Home} />
+        <Route path='/people' component={People} />
+        <Route path='/planets' render={(props)=> <Planets {...props}/>} />
+
+       
+      
       </div>
+      </Router>
     );
   }
 }
